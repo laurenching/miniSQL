@@ -2,8 +2,8 @@
 //  base.cpp
 //  minisql
 //
-//  Created by 楊淯晴 on 2019/5/30.
-//  Copyright © 2019 楊淯晴. All rights reserved.
+//  Created by yyy on 2019/5/30.
+//  Copyright © 2019 yyy. All rights reserved.
 //
 
 #include "base.hpp"
