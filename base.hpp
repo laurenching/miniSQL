@@ -90,5 +90,4 @@ public:
     Index getIndex();
     void show();//show all the tuple in a table
 };
-
 #endif /* base_hpp */
