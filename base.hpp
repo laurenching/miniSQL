@@ -15,7 +15,7 @@ using namespace std;
 struct Attribute
 {
     int numberOfAttribute;// the total number of the attributes
-    short dataType[32];// -1 int 0 float 1~255 char
+    short type[32];// -1 int 0 float 1~255 char
     string name[32];// name of the attribute
     bool unique[32];//the attribute is unique or not
     bool hasIndex[32];
@@ -38,10 +38,10 @@ struct Data
 };
 typedef enum
 {
-    less, //<
+    Less, //<
     lessEqual, //<=
-    equal,//=
-    greater,//>
+    Equal,//=
+    Greater,//>
     greaterEqual,//>=
     notEqual//!=
 }WHERE;
