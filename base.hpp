@@ -67,7 +67,7 @@ public:
     ~Tuple();
     vector<Data> getData() const;//return the data
     void addData(Data data);//add data to tuple
-    bool ifDelete();
+    bool ifDeleted();
     void Delete();
     int getTupleSize();//return number of data in a tuple
     void show();//show all the data in a tuple
