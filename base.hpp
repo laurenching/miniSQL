@@ -11,6 +11,10 @@
 #include<vector>
 #include <iostream>
 
+
+#define PAGESIZE 4096// 每一页的大小为4KB
+#define MAXFRAMESIZE 100// 最大页数为100
+
 using namespace std;
 struct Attribute
 {
