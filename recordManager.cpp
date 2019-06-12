@@ -116,15 +116,13 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
     {
         insertBlock=blockNum-1;
         insertTupleToTable(p,insertLoacation,tupleLength,data);//insert
-       // int pageId=BufferManage.getPageId(tableFile,blockNum-1);
-      //BufferManager.modifyPage(pageId);
+       
     }
     else{//新增一塊
         insertBlock=blockNum;
         char *p=bufferManager.getPage(tableFile,blockNum);
         insertTupleToTable(p, 0, tupleLength, data);
-       // int pageId=BufferManage.getPageId(tableFile,blockNum);
-      //BufferManager.modifyPage(pageId);
+       
     }
     
     int pageId=bufferManager.getPageId(tableFile,insertBlock);
