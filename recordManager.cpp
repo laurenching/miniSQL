@@ -3,8 +3,8 @@
 //  recordManager.cpp
 //  minisql
 //
-//  Created by 楊淯晴 on 2019/6/5.
-//  Copyright © 2019 楊淯晴. All rights reserved.
+//  Created by yyy on 2019/6/5.
+//  Copyright © 2019 yyy. All rights reserved.
 //
 
 #include "recordＭanager.hpp"
@@ -191,7 +191,6 @@ int RecordManager::deleteRecord(string tableName)//刪除該表所有元組
             p+=tupleLength;
             *(p-2)='1';
             deleteRecordNumber++;
-            //p=deleteRecordFromTable(p);
         }
         int pageId=bufferManager.getPageId(tableFile,i);//獲得page
         bufferManager.modifyPage(pageId);
@@ -487,39 +486,7 @@ void RecordManager::searchWithIndex(string tableName, string searchAttr, Where w
     {
         indexManager.searchRange(filePath , where.data , where.data , blockId);
     }
-    /*
-        if (where.relation == Less || where.relation == lessEqual) {
-            if (where.data.type == -1) {//int
-                tempData.type = -1;
-                tempData.datai = -INF;
-            }
-            else if (where.data.type == 0) {//float
-                tempData.type = 0;
-                tempData.dataf = -INF;
-            }
-            else {
-                tempData.type = 1;
-                tempData.datas = "";
-            }
-            index_manager.searchRange(filePath ,tempData, where.data , blockId);
-        }
-        else if (where.relation == greater || where.relation == greaterEqual) {
-            if (where.data.type == -1) {
-                tempData.type = -1;
-                tempData.datai = INF;
-            }
-            else if (where.data.type == 0) {
-                tempData.type = 0;
-                tempData.dataf = INF;
-            }
-            else {
-                tempData.type = -2;
-            }
-            index_manager.searchRange(filePath , where.data , tempData, blockId);
-        }
-        else {
-            index_manager.searchRange(filePath , where.data , where.data , blockId);
-        }*/
+   
 }
 
 
