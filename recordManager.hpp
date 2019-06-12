@@ -2,8 +2,8 @@
 //  recordManager.hpp
 //  minisql
 //
-//  Created by 楊淯晴 on 2019/6/5.
-//  Copyright © 2019 楊淯晴. All rights reserved.
+//  Created by yyy on 2019/6/5.
+//  Copyright © 2019 yyy. All rights reserved.
 //
 
 #ifndef recordManager_hpp
