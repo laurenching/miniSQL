@@ -1,6 +1,14 @@
 #ifndef __TREENODE__
 #define __TREENODE__
 
+
+
+
+
+
+
+
+
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -343,3 +351,5 @@ void TreeNode<T>::printl() {
     cout << endl;
     
 }
+
+#endif

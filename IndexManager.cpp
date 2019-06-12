@@ -10,7 +10,7 @@ indexManager::indexManager(string tableName) {//构造函数，对于每一个at
     Attribute attr = catalog.getAttribute(tableName);
 
     for (int i = 0; i < attr.numberOfAttribute; i++) {
-        if (attr.has_index[i]){
+        if (attr.hasIndex[i]){
             createIndex("INDEX_FILE_"+attr.name[i]+tableName,attr.type[i]);
         }
     }
@@ -35,9 +35,6 @@ indexManager::~indexManager() {//析构函数，在释放时把map中B+树指针
             delete itFloat->second;
         }
     }
-    delete intMap;
-    delete floatMap;
-    delete stringMap;
 }
 
 

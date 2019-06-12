@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "const.h"
 
 // Page类。磁盘文件中的每一块对应内存中的一个页（page)
 class Page {

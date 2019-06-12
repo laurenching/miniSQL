@@ -7,11 +7,20 @@
 
 #include "TreeNode.h"
 
+#endif
 
 template <typename T>
 class BPlusTree {
 private:
-    
+	//重命名TreeNode指针，方便后边进行操作区分
+    typedef TreeNode<T>* Tree;
+	//特殊结构，用于临时存储查找的key值及所处的位置，方便进行操作
+    struct searchNodeParse {
+        Tree pNode; //包含对应key的结点指针
+        unsigned int index; //key在结点中的index
+        bool ifFound; //是否找到该key
+    };
+
 public:
     BPlusTree(std::string m_name, int key_size, int degree);
     ~BPlusTree();
@@ -21,7 +30,7 @@ public:
     void dropTree(Tree node);
     void searchRange(T &key1, T &key2, std::vector<int>& vals, int flag);
     void readFromDiskAll();
-    void writtenbackToDiskAll();
+    void writtenBackToDiskAll();
     void readFromDisk(char *p, char* end);
     void printleaf();
     
@@ -32,13 +41,13 @@ private:
     void findToLeaf(Tree pNode, T key, searchNodeParse &snp);
     void getFile(std::string file_path);
     int getBlockNum(std::string table_name);
-    typedef TreeNode<T>* Tree;
+    //typedef TreeNode<T>* Tree;
 
-    struct searchNodeParse {
+    /* struct searchNodeParse {
         Tree pNode; //包含对应key的结点指针
         unsigned int index; //key在结点中的index
         bool ifFound; //是否找到该key
-    };
+    };*/
     string file_name;
     Tree root;
     Tree leafHead;
@@ -95,7 +104,7 @@ void BPlusTree<T>::initTree()
 
 //用于查找某key值所处的叶结点位置
 template <class T>
-void BPlusTree<T>::findToLeaf(Tree pNode, T key, searchNodeParse &snp)
+inline void BPlusTree<T>::findToLeaf(Tree pNode, T key, searchNodeParse &snp)
 {
     unsigned int index = 0;
 	//在对应结点内查找key值
@@ -668,7 +677,7 @@ void BPlusTree<T>::readFromDisk(char* p, char* end)
 
 
 template <class T>
-void BPlusTree<T>::writtenbackToDiskAll()
+void BPlusTree<T>::writtenBackToDiskAll()
 {
     std::string fname = "./database/index/" + file_name;
     //std::string fname = file_name;
@@ -738,3 +747,4 @@ void copyString(char* p , int& offset , T data) {
     for (int i = 0;i < s1.length();i++,offset++)
         p[offset] = s1[i];
 }
+

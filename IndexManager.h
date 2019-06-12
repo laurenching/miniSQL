@@ -26,7 +26,8 @@ public:
     ~indexManager();//析构函数
     void createIndex(string filePath,int type);//建立索引
     void insertIndex(string filePath,Data data,int blockId);//插入索引
-    void dropIndex(string filePath,Data data);//删除一个索引
+    void dropIndex(string filePath,int type);//删除一个索引
+    int findIndex(std::string file_path, Data data);
     void deleteIndexByKey(string filePath,Data data);
     void searchRange(string filePath,Data data1,Data data2,vector<int>& vals);
 private:
