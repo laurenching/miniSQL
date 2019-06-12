@@ -154,6 +154,10 @@ int indexManager::findIndex(string filePath, Data data) {//查找数据对应的
     }
 }
 //flag
+
+
+
+
 void indexManager::deleteIndexByKey(string filePath, Data data) {
     if (data.type == TYPE_INT) {
         intMap::iterator itInt = indexIntMap.find(filePath);
