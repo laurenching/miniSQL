@@ -31,7 +31,7 @@ public:
     void deleteIndexByKey(string filePath,Data data);
     void searchRange(string filePath,Data data1,Data data2,vector<int>& vals);
 private:
-    int getDegree(int type);//获取到B+树的深度
+    int getDegree(int type);//获取到每个节点的degree
     int getKeySize(int type);//获取到key的大小
 
     typedef map<string,BPlusTree<int>*> intMap;//以下针对不同的数据类型构建了三张表
