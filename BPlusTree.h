@@ -2,6 +2,8 @@
 // Created by Kfor on 2019/6/09.
 //
 
+//这个文件构建了B+树的定义，用于存放index以供indexManger操作
+
 #ifndef __BPLUSTREE__
 #define __BPLUSTREE__
 
@@ -22,13 +24,13 @@ private:
     };
 
 public:
-    BPlusTree(std::string m_name, int key_size, int degree);
+    BPlusTree(string mName, int keySize, int degree);
     ~BPlusTree();
     int searchVal(T &key);
     bool insertKey(T &key, int val);
     bool deleteKey(T &key);
     void dropTree(Tree node);
-    void searchRange(T &key1, T &key2, std::vector<int>& vals, int flag);
+    void searchRange(T &key1, T &key2, vector<int>& vals, int flag);
     void readFromDiskAll();
     void writtenBackToDiskAll();
     void readFromDisk(char *p, char* end);
@@ -39,39 +41,33 @@ private:
     bool adjustAfterinsert(Tree pNode);
     bool adjustAfterDelete(Tree pNode);
     void findToLeaf(Tree pNode, T key, searchNodeParse &snp);
-    void getFile(std::string file_path);
-    int getBlockNum(std::string table_name);
-    //typedef TreeNode<T>* Tree;
-
-    /* struct searchNodeParse {
-        Tree pNode; //包含对应key的结点指针
-        unsigned int index; //key在结点中的index
-        bool ifFound; //是否找到该key
-    };*/
-    string file_name;
+    void getFile(string file_path);
+    int getBlockNum(string table_name);
+    
+    string fileName;
     Tree root;
     Tree leafHead;
-    unsigned int key_num;
+    unsigned int keyNum;
     unsigned int level;
-    unsigned int node_num;
-    int key_size;
+    unsigned int nodeNum;
+    int keySize;
     int degree;
 };
 
 
 //构造函数
-//用于构造一颗新的树，确定m_name,key的size，树的度
+//用于构造一颗新的树，确定mName,key的size，树的度
 //初始化各个变量
 //同时调用其他函数为本树分配内存
 template <class T>
-BPlusTree<T>::BPlusTree(std::string in_name, int keysize, int in_degree):
-	file_name(in_name),
-	key_num(0),
+BPlusTree<T>::BPlusTree(string in_name, int keysize, int in_degree):
+	fileName(in_name),
+	keyNum(0),
 	level(0),
-	node_num(0),
+	nodeNum(0),
 	root(NULL),
 	leafHead(NULL),
-	key_size(keysize),
+	keySize(keysize),
 	degree(in_degree)
 {
 	//初始化分配内存并从磁盘读取数据
@@ -86,7 +82,7 @@ template <class T>
 BPlusTree<T>:: ~BPlusTree()
 {
     dropTree(root);
-    key_num = 0;
+    keyNum = 0;
     root = NULL;
     level = 0;
 }
@@ -96,9 +92,9 @@ template <class T>
 void BPlusTree<T>::initTree()
 {
     root = new TreeNode<T>(degree, true);
-    key_num = 0;
+    keyNum = 0;
     level = 1;
-    node_num = 1;
+    nodeNum = 1;
     leafHead = root;
 }
 
@@ -165,7 +161,7 @@ bool BPlusTree<T>::insertKey(T &key, int val)
         if (snp.pNode->num == degree) {
             adjustAfterinsert(snp.pNode);
         }
-        key_num++;
+        keyNum++;
         return true;
     }
 
@@ -178,7 +174,7 @@ bool BPlusTree<T>::adjustAfterinsert(Tree pNode)
 {
     T key;
     Tree newNode = pNode->splitNode(key);
-    node_num++;
+    nodeNum++;
 
 	//当前结点为根结点情况
     if (pNode->isRoot()) {
@@ -190,7 +186,7 @@ bool BPlusTree<T>::adjustAfterinsert(Tree pNode)
 			*/
         } else {
             level ++;
-            node_num ++;
+            nodeNum ++;
             this->root = root;
             pNode->parent = root;
             newNode->parent = root;
@@ -254,7 +250,7 @@ bool BPlusTree<T>::deleteKey(T &key)
         } else { //正常找到进行删除
             if (snp.pNode->isRoot()) { //当前为根结点
                 snp.pNode->deleteKeyByIndex(snp.index);
-                key_num--;
+                keyNum--;
                 return adjustAfterDelete(snp.pNode);
             } else {
                 if (snp.index == 0 && leafHead != snp.pNode) {
@@ -275,12 +271,12 @@ bool BPlusTree<T>::deleteKey(T &key)
                     now_parent -> keys[index] = snp.pNode->keys[1];
 
                     snp.pNode->deleteKeyByIndex(snp.index);
-                    key_num--;
+                    keyNum--;
                     return adjustAfterDelete(snp.pNode);
 
                 } else { //同时必然存在于叶结点
                     snp.pNode->deleteKeyByIndex(snp.index);
-                    key_num--;
+                    keyNum--;
                     return adjustAfterDelete(snp.pNode);
                 }
             }
@@ -310,14 +306,14 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
                 root = NULL;
                 leafHead = NULL;
                 level--;
-                node_num--;
+                nodeNum--;
             }
             else { //根节点将成为左头部
                 root = pNode -> childs[0];
                 root -> parent = NULL;
                 delete pNode;
                 level--;
-                node_num--;
+                nodeNum--;
             }
         }
     } else { //非根节点情况
@@ -353,7 +349,7 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
                     brother->nextLeafNode = pNode->nextLeafNode;
 
                     delete pNode;
-                    node_num--;
+                    nodeNum--;
 
                     return adjustAfterDelete(parent);
                 }
@@ -386,7 +382,7 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
                     pNode->num += brother->num;
                     pNode->nextLeafNode = brother->nextLeafNode;
                     delete brother;
-                    node_num--;
+                    nodeNum--;
 
                     return adjustAfterDelete(parent);
                 }
@@ -431,7 +427,7 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
                     brother->num += pNode->num;
 
                     delete pNode;
-                    node_num --;
+                    nodeNum --;
 
                     return adjustAfterDelete(parent);
                 }
@@ -479,7 +475,7 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
                     pNode->num += brother->num;
 
                     delete brother;
-                    node_num--;
+                    nodeNum--;
 
                     return adjustAfterDelete(parent);
                 }
@@ -510,14 +506,14 @@ void BPlusTree<T>::dropTree(Tree node)
         }
     }
     delete node;
-    node_num--;
+    nodeNum--;
     return;
 }
 
 //输入：key1，key2，返回vals的容器
 //功能：返回范围搜索结果，将value放入vals容器中
 template <class T>
-void BPlusTree<T>::searchRange(T& key1, T& key2, std::vector<int>& vals, int flag)
+void BPlusTree<T>::searchRange(T& key1, T& key2, vector<int>& vals, int flag)
 {
 	//空树
 	if (!root)
@@ -588,14 +584,14 @@ void BPlusTree<T>::searchRange(T& key1, T& key2, std::vector<int>& vals, int fla
 	}
 	//}
 
-	std::sort(vals.begin(),vals.end());
+	sort(vals.begin(),vals.end());
     vals.erase(unique(vals.begin(), vals.end()), vals.end());
 	return;
 }
 
 //获取文件大小
 template <class T>
-void BPlusTree<T>::getFile(std::string fname) {
+void BPlusTree<T>::getFile(string fname) {
     FILE* f = fopen(fname.c_str() , "r");
     if (f == NULL) {
         f = fopen(fname.c_str(), "w+");
@@ -607,7 +603,7 @@ void BPlusTree<T>::getFile(std::string fname) {
 }
 
 template <class T>
-int BPlusTree<T>::getBlockNum(std::string table_name)
+int BPlusTree<T>::getBlockNum(string table_name)
 {
     char* p;
     int block_num = -1;
@@ -621,8 +617,8 @@ int BPlusTree<T>::getBlockNum(std::string table_name)
 template <class T>
 void BPlusTree<T>::readFromDiskAll()
 {
-    std::string fname = "./database/index/" + file_name;
-    //std::string fname = file_name;
+    string fname = "./database/index/" + fileName;
+    //string fname = fileName;
     getFile(fname);
     int block_num = getBlockNum(fname);
 
@@ -657,8 +653,8 @@ void BPlusTree<T>::readFromDisk(char* p, char* end)
             for (j = 0; i < PAGESIZE && p[i] != ' '; i++)
                 tmp[j++] = p[i];
             tmp[j] = '\0';
-            std::string s(tmp);
-            std::stringstream stream(s);
+            string s(tmp);
+            stringstream stream(s);
             stream >> key;
             
             memset(tmp, 0, sizeof(tmp));
@@ -667,8 +663,8 @@ void BPlusTree<T>::readFromDisk(char* p, char* end)
             for (j = 0; i < PAGESIZE && p[i] != ' '; i++)
                 tmp[j++] = p[i];
             tmp[j] = '\0';
-            std::string s1(tmp);
-            std::stringstream stream1(s1);
+            string s1(tmp);
+            stringstream stream1(s1);
             stream1 >> value;
             
             insertKey(key, value);
@@ -679,8 +675,8 @@ void BPlusTree<T>::readFromDisk(char* p, char* end)
 template <class T>
 void BPlusTree<T>::writtenBackToDiskAll()
 {
-    std::string fname = "./database/index/" + file_name;
-    //std::string fname = file_name;
+    string fname = "./database/index/" + fileName;
+    //string fname = fileName;
     getFile(fname);
 	int block_num = getBlockNum(fname);
 

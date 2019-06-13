@@ -181,7 +181,7 @@ void indexManager::deleteIndexByKey(string filePath, Data data) {//按照给出�
     }
 }
 
-int indexManager::getDegree(int type) {//计算所需B+树的深度，实际效果相当于取log
+int indexManager::getDegree(int type) {//计算每个节点的度
     int degree = (PAGESIZE - sizeof(int)) / (getKeySize(type) + sizeof(int));
     if (degree % 2 == 0)
 		degree -= 1;
