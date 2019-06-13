@@ -10,7 +10,7 @@ indexManager::indexManager(string tableName) {//构造函数，对于每一个at
     Attribute attr = catalog.getAttribute(tableName);
 
     for (int i = 0; i < attr.numberOfAttribute; i++) {
-        if (attr.has_index[i]){
+        if (attr.hasIndex[i]){
             createIndex("INDEX_FILE_"+attr.name[i]+tableName,attr.type[i]);
         }
     }
@@ -35,9 +35,6 @@ indexManager::~indexManager() {//析构函数，在释放时把map中B+树指针
             delete itFloat->second;
         }
     }
-    delete intMap;
-    delete floatMap;
-    delete stringMap;
 }
 
 
@@ -153,20 +150,16 @@ int indexManager::findIndex(string filePath, Data data) {//查找数据对应的
             return itString->second->searchVal(data.stringData);
     }
 }
-//flag
 
-
-
-
-void indexManager::deleteIndexByKey(string filePath, Data data) {
+void indexManager::deleteIndexByKey(string filePath, Data data) {//按照给出的data键值删除索引
     if (data.type == TYPE_INT) {
-        intMap::iterator itInt = indexIntMap.find(filePath);
+        intMap::iterator itInt = indexIntMap.find(filePath);//先找到位置，判断是否有索引
         if (itInt == indexIntMap.end()) {
             cout << "Error:in search index, no index " << filePath <<" exits" << endl;
             return;
         }
         else
-            itInt->second->deleteKey(data.intData);
+            itInt->second->deleteKey(data.intData);//如果有索引，就调用B+树接口将其删除
     }
     else if (data.type == TYPE_FLOAT) {
         floatMap::iterator itFloat = indexFloatMap.find(filePath);
@@ -188,14 +181,14 @@ void indexManager::deleteIndexByKey(string filePath, Data data) {
     }
 }
 
-int indexManager::getDegree(int type) {
+int indexManager::getDegree(int type) {//计算每个节点的度
     int degree = (PAGESIZE - sizeof(int)) / (getKeySize(type) + sizeof(int));
     if (degree % 2 == 0)
 		degree -= 1;
     return degree;
 }
 
-int indexManager::getKeySize(int type) {
+int indexManager::getKeySize(int type) {//返回key大小
     if (type == TYPE_FLOAT)
         return sizeof(float);
     else if (type == TYPE_INT)
@@ -208,8 +201,7 @@ int indexManager::getKeySize(int type) {
     }
 }
 
-void indexManager::searchRange(std::string filePath, Data data1, Data data2, std::vector<int>& vals)
-{
+void indexManager::searchRange(string filePath, Data data1, Data data2, vector<int>& vals) {//在范围内搜索，给出vector引用作为结果
     int flag = 0;
     //检测数据类型是否匹配
     if (data1.type == -2) {
@@ -220,13 +212,13 @@ void indexManager::searchRange(std::string filePath, Data data1, Data data2, std
     }
     
     if (data1.type == TYPE_INT) {
-        intMap::iterator itInt = indexIntMap.find(filePath);
+        intMap::iterator itInt = indexIntMap.find(filePath);//寻找是否有索引
         if (itInt == indexIntMap.end()) {
             cout << "Error:in search index, no index " << filePath <<" exits" << endl;
             return;
         }
         else
-            itInt->second->searchRange(data1.intData, data2.intData, vals, flag);
+            itInt->second->searchRange(data1.intData, data2.intData, vals, flag);//有索引就修改vals为所需结果
     }
     else if (data1.type == TYPE_FLOAT) {
         floatMap::iterator itFloat = indexFloatMap.find(filePath);
