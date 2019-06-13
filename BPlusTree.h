@@ -24,51 +24,40 @@ private:
     };
 
 public:
-    BPlusTree(string mName, int keySize, int degree);
-    ~BPlusTree();
-    int searchVal(T &key);
-    bool insertKey(T &key, int val);
-    bool deleteKey(T &key);
-    void dropTree(Tree node);
-    void searchRange(T &key1, T &key2, vector<int>& vals, int flag);
-    void readFromDiskAll();
-    void writtenBackToDiskAll();
-    void readFromDisk(char *p, char* end);
+    BPlusTree(string mName, int keySize, int degree);//构造函数，赋初始值并分配内存，从磁盘读取数据
+    ~BPlusTree();//析构函数
+    int searchVal(T &key);//搜索value值，即搜索索引
+    bool insertKey(T &key, int val);//在val索引处插入一个key，返回是否成功
+    bool deleteKey(T &key);//删除键
+    void dropTree(Tree node);//删除树
+    void searchRange(T &key1, T &key2, vector<int>& vals, int flag);//搜索两个key之间的值，通过修改vals得到索引结果。flag为节点类型
+    void readFromDiskAll();//从磁盘读取数据
+    void writtenBackToDiskAll();//写回磁盘
+    void readFromDisk(char *p, char* end);//从磁盘读取制定数据
     void printleaf();
     
 private:
-    void initTree();
-    bool adjustAfterinsert(Tree pNode);
-    bool adjustAfterDelete(Tree pNode);
-    void findToLeaf(Tree pNode, T key, searchNodeParse &snp);
-    void getFile(string file_path);
-    int getBlockNum(string table_name);
+    void initTree();//初始化
+    bool adjustAfterinsert(Tree pNode);//插入后调整
+    bool adjustAfterDelete(Tree pNode);//删除后调整
+    void findToLeaf(Tree pNode, T key, searchNodeParse &snp);//在叶子节点中找值
+    void getFile(string filePath);//获取文件
+    int getBlockNum(string tableName);//获取block的id
     
-    string fileName;
-    Tree root;
-    Tree leafHead;
-    unsigned int keyNum;
-    unsigned int level;
-    unsigned int nodeNum;
-    int keySize;
-    int degree;
+    string fileName;//文件名
+    Tree root;//根
+    Tree leafHead;//叶节点的最左端，用于遍历结果用
+    unsigned int keyNum;//关键字数目
+    unsigned int level;//树的层数
+    unsigned int nodeNum;//节点数目
+    int keySize;//每个key的大小
+    int degree;//每个节点的度
 };
 
 
-//构造函数
-//用于构造一颗新的树，确定mName,key的size，树的度
-//初始化各个变量
-//同时调用其他函数为本树分配内存
 template <class T>
-BPlusTree<T>::BPlusTree(string in_name, int keysize, int in_degree):
-	fileName(in_name),
-	keyNum(0),
-	level(0),
-	nodeNum(0),
-	root(NULL),
-	leafHead(NULL),
-	keySize(keysize),
-	degree(in_degree)
+BPlusTree<T>::BPlusTree(string inName, int keySize, int inDegree):
+	fileName(inName),keyNum(0),level(0),nodeNum(0),root(NULL),leafHead(NULL),keySize(keySize),degree(inDegree)
 {
 	//初始化分配内存并从磁盘读取数据
 	//创建索引
@@ -76,8 +65,6 @@ BPlusTree<T>::BPlusTree(string in_name, int keysize, int in_degree):
     readFromDiskAll();
 }
 
-//析构函数
-//释放相应的内存
 template <class T>
 BPlusTree<T>:: ~BPlusTree()
 {
@@ -137,10 +124,6 @@ inline void BPlusTree<T>::findToLeaf(Tree pNode, T key, searchNodeParse &snp)
 	return;
 }
 
-//输入：key值及其value
-//输出：bool
-//功能：在树中插入一个key值
-//返回是否插入成功
 template <class T>
 bool BPlusTree<T>::insertKey(T &key, int val)
 {
@@ -225,10 +208,6 @@ int BPlusTree<T>::searchVal(T& key)
         return snp.pNode->vals[snp.index];
 }
 
-//输入：key值
-//输出：bool
-//功能：在树中删除一个key值
-//返回是否删除成功
 template <class T>
 bool BPlusTree<T>::deleteKey(T &key)
 {
@@ -489,9 +468,6 @@ bool BPlusTree<T>::adjustAfterDelete(Tree pNode)
     return false;
 }
 
-
-//输入：树的根结点
-//功能：删除整棵树并释放内存空间，主要用在析构函数中
 template <class T>
 void BPlusTree<T>::dropTree(Tree node)
 {
@@ -510,8 +486,6 @@ void BPlusTree<T>::dropTree(Tree node)
     return;
 }
 
-//输入：key1，key2，返回vals的容器
-//功能：返回范围搜索结果，将value放入vals容器中
 template <class T>
 void BPlusTree<T>::searchRange(T& key1, T& key2, vector<int>& vals, int flag)
 {
@@ -603,12 +577,12 @@ void BPlusTree<T>::getFile(string fname) {
 }
 
 template <class T>
-int BPlusTree<T>::getBlockNum(string table_name)
+int BPlusTree<T>::getBlockNum(string tableName)
 {
     char* p;
     int block_num = -1;
     do {
-        p = buffer_manager.getPage(table_name , block_num + 1);
+        p = buffer_manager.getPage(tableName , block_num + 1);
         block_num++;
     } while(p[0] != '\0');
     return block_num;

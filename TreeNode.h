@@ -27,7 +27,7 @@ public:
     unsigned int num;//该结点内key数量
     TreeNode* parent;//指向父节点
     vector <T> keys;//存放key
-    vector <int> vals;//存放value
+    vector <int> vals;//存放value，其实际意义为该处的索引
     vector <TreeNode*> childs;//指向子结点
     TreeNode* nextLeafNode;//指向下一个叶结点的
     bool isLeaf;//判断是否为叶节点
