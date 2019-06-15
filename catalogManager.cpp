@@ -37,8 +37,8 @@ void CatalogManager::createTable(name, Attribute Attr, int primary, Index index)
         block_num=1;
     //遍历所有的块
     for(int current_block=0;current_block<block_num;current_block++){
-        char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , current_block);
-        int page_id = buffer_manager.getPageId(TABLE_MANAGER_PATH , current_block);
+        char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , current_block);
+        int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , current_block);
         //寻找该block的有效长度
         int length=0;
         for(length=0;length<PAGESIZE&&buffer[length]!='\0'&&buffer[length]!='#';length++){}
@@ -52,15 +52,15 @@ void CatalogManager::createTable(name, Attribute Attr, int primary, Index index)
             //字符串拼接
             strcat(buffer , str_tmp.c_str());
             //保存并刷新该页后返回
-            buffer_manager.modifyPage(page_id);
+            bufferManager.modifyPage(page_id);
             return;
         }
     }
     //如果之前的块不够用，就新建一块后直接把信息插入
-    char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , block_num);
-    int page_id = buffer_manager.getPageId(TABLE_MANAGER_PATH , block_num);
+    char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , block_num);
+    int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , block_num);
     strcat(buffer , str_tmp.c_str());
-    buffer_manager.modifyPage(page_id);
+    bufferManager.modifyPage(page_id);
     
 }
 
@@ -73,8 +73,8 @@ void CatalogManager::dropTable(string name){
     int suitable_block;
     int start_index=getTablePlace(name,suitable_block);
     //得到所对应块的信息
-    char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , suitable_block);
-    int page_id = buffer_manager.getPageId(TABLE_MANAGER_PATH , suitable_block);
+    char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
+    int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , suitable_block);
     string buffer_check(buffer);
     //求出应删除的块的index的开始和结尾后删除
     int end_index=start_index+str2num(buffer_check.substr(start_index,4));
@@ -87,7 +87,7 @@ void CatalogManager::dropTable(string name){
     buffer[current_index++]='#';
     buffer[current_index]='\0';
     //刷新页面
-    buffer_manager.modifyPage(page_id);
+    bufferManager.modifyPage(page_id);
 }
 
 Attribute CatalogManager::getAttribute(string name){
@@ -99,7 +99,7 @@ Attribute CatalogManager::getAttribute(string name){
     int suitable_block;
     int start_index=getTablePlace(name,suitable_block);
     //得到所对应的块的信息
-    char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , suitable_block);
+    char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
     string buffer_check(buffer);
     //end_index记录该行中表的名字的最后一个字符的位置
     int end_index=0;
@@ -343,7 +343,7 @@ bool CatalogManager::hasTable(string table_name)
         block_num=1;
     //遍历所有的块
     for(int current_block=0;current_block<block_num;current_block++){
-        char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , current_block);
+        char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , current_block);
         string buffer_check(buffer);
         string str_tmp="";
         int start_index=0,end_index=0;
@@ -409,7 +409,7 @@ int CatalogManager::getTablePlace(string name,int &suitable_block){
         block_num=1;
     //遍历所有的块
     for(suitable_block=0;suitable_block<block_num;suitable_block++){
-        char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , suitable_block);
+        char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
         string buffer_check(buffer);
         string str_tmp="";
         int start=0,rear=0;
@@ -436,7 +436,7 @@ Index CatalogManager::getIndex(string table_name){
     //得到该表的位置和对应的块
     int suitable_block;
     int start_index=getTablePlace(table_name,suitable_block);
-    char* buffer = buffer_manager.getPage(TABLE_MANAGER_PATH , suitable_block);
+    char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
     //将start_index对齐索引信息的位置
     string buffer_check(buffer);
     while(buffer_check[start_index]!=';')
@@ -462,7 +462,7 @@ int CatalogManager::getBlockNum(string table_name) {
     char* p;
     int block_num = -1;
     do {
-        p = buffer_manager.getPage(table_name , block_num + 1);
+        p = bufferManager.getPage(table_name , block_num + 1);
         block_num++;
     } while(p[0] != '\0');
     return block_num;
