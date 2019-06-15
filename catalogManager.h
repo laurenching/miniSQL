@@ -82,4 +82,4 @@ private:
     int getBlockNum(string table_name);
 };
 
-#endif /* catalog_hpp */
+#endif
