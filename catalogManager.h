@@ -55,7 +55,7 @@ public:
     //输出：索引所对应的属性名
     //功能：通过索引名定位属性名
     //异常：如果表不存在，抛出table_not_exist异常。如果对应索引不存在，抛出index_not_exist异常。
-    std::string indextoAttr(string table_name, string index_name);
+    std::string IndextoAttr(string table_name, string index_name);
     //输入：表名，索引名
     //输出：void
     //功能：删除对应表的对应属性上的索引
