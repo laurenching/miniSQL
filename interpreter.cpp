@@ -101,41 +101,41 @@ void Interpreter::EXEC(){
         }
         //如果所有指令都不能对应，则抛出输入格式错误
         else{
-            throw input_format_error();
+            throw inputFormatError();
         }
     }
     
-    catch(table_exist error){
+    catch(tableExist error){
         cout<<">>> Error: Table has existed!"<<endl;
     }
-    catch(table_not_exist error) {
+    catch(tableNotExist error) {
         cout<<">>> Error: Table not exist!"<<endl;
     }
-    catch(attribute_not_exist error) {
+    catch(attributeNotExist error) {
         cout<<">>> Error: Attribute not exist!"<<endl;
     }
-    catch(index_exist error) {
+    catch(indexExist error) {
         cout<<">>> Error: Index has existed!"<<endl;
     }
-    catch(index_not_exist error) {
+    catch(indexNotExist error) {
         cout<<">>> Error: Index not existed!"<<endl;
     }
-    catch(tuple_type_conflict error) {
+    catch(tupleTypeConflict error) {
         cout<<">>> Error: Tuple type conflict!"<<endl;
     }
-    catch(primary_key_conflict error) {
+    catch(primarykeyConflict error) {
         cout<<">>> Error: Primary key conflict!"<<endl;
     }
-    catch(data_type_conflict error) {
+    catch(dataTypeConflict error) {
         cout<<">>> Error: data type conflict!"<<endl;
     }
-    catch(index_full error) {
+    catch(indexFull error) {
         cout<<">>> Error: Index full!"<<endl;
     }
-    catch(unique_conflict error) {
+    catch(uniqueConflict error) {
         cout<<">>> Error: unique conflict!"<<endl;
     }
-    catch(exit_command error){
+    catch(exitCommand error){
         cout<<">>> Bye bye~"<<endl;
         exit(0);
     }
@@ -157,7 +157,7 @@ void Interpreter::EXEC_CREATE_INDEX(){
         throw 1;//格式错误
     table_name=getWord(check_index+3, check_index);
     if(!CM.hasTable(table_name))
-        throw table_not_exist();//table not exist
+        throw tableNotExist();//table not exist
     if(query[check_index+1]!='(')
         throw 1;//格式错误
     attr_name=getWord(check_index+3, check_index);
@@ -189,7 +189,7 @@ void Interpreter::EXEC_DROP_INDEX(){
 
 void Interpreter::EXEC_EXIT(){
     //如果需要退出，直接抛出一个exit command
-    throw exit_command();
+    throw exitCommand();
 }
 
 void Interpreter::EXEC_FILE(){
@@ -249,7 +249,7 @@ void Interpreter::EXEC_DELETE(){
         throw 1;
     table_name=getWord(12, check_index);
     if(!CM.hasTable(table_name))
-        throw table_not_exist();
+        throw tableNotExist();
     
     //处理删除所有信息的情况
     if(query[check_index+1]=='\0'){
@@ -263,51 +263,51 @@ void Interpreter::EXEC_DELETE(){
         throw 1;//格式错误
     attr_name=getWord(check_index+7, check_index);
     if(!CM.hasAttribute(table_name, attr_name))
-        throw attribute_not_exist();
+        throw attributeNotExist();
     relation=getRelation(check_index+1, check_index);
     if(relation=="<")
-        where_delete.relation_character=LESS;
+        where_delete.relation=Less;
     else if(relation=="< =")
-        where_delete.relation_character=LESS_OR_EQUAL;
+        where_delete.relation=lessEqual;
     else if(relation=="=")
-        where_delete.relation_character=EQUAL;
+        where_delete.relation=Equal;
     else if(relation=="> =")
-        where_delete.relation_character=GREATER_OR_EQUAL;
+        where_delete.relation=greaterEqual;
     else if(relation==">")
-        where_delete.relation_character=GREATER;
+        where_delete.relation=Greater;
     else if(relation=="! =")
-        where_delete.relation_character=NOT_EQUAL;
+        where_delete.relation=notEqual;
     else
         throw 1;//格式错误
     string value_delete=getWord(check_index+1, check_index);
     
     Attribute tmp_attr=CM.getAttribute(table_name);
-    for(int i=0;i<tmp_attr.num;i++)
+    for(int i=0;i<tmp_attr.numberOfAttribute;i++)
     {
         if(attr_name==tmp_attr.name[i]){
             where_delete.data.type=tmp_attr.type[i];
             switch (where_delete.data.type) {
                 case -1:
                     try {
-                        where_delete.data.datai=stringToNum<int>(value_delete);
+                        where_delete.data.intData =stringToNum<int>(value_delete);
                     } catch (...) {
-                        throw data_type_conflict();//转换失败
+                        throw dataTypeConflict();//转换失败
                     }
                     break;
                 case 0:
                     try {
-                        where_delete.data.dataf=stringToNum<float>(value_delete);
+                        where_delete.data.floatData=stringToNum<float>(value_delete);
                     } catch (...) {
-                        throw data_type_conflict();//转换失败
+                        throw dataTypeConflict();//转换失败
                     }
                     break;
                 default:
                     try {
                         if(!(value_delete[0]=='\''&&value_delete[value_delete.length()-1]=='\'')&&!(value_delete[0]=='"'&&value_delete[value_delete.length()-1]=='"'))
                             throw 1;//格式不正确
-                        where_delete.data.datas=value_delete.substr(1,value_delete.length()-2);
+                        where_delete.data.stringData=value_delete.substr(1,value_delete.length()-2);
                     } catch (...) {
-                        throw data_type_conflict();//转换失败
+                        throw dataTypeConflict();//转换失败
                     }
                     break;
             }
@@ -326,21 +326,21 @@ void Interpreter::EXEC_INSERT(){
     Tuple tuple_insert;
     Attribute attr_exist;
     if(getLower(query, 7).substr(7,4)!="into")
-        throw input_format_error();
+        throw inputFormatError();
     table_name=getWord(12, check_index);
     if(getLower(query, check_index+1).substr(check_index+1,6)!="values")
-        throw input_format_error();
+        throw inputFormatError();
     check_index+=8;
     if(query[check_index]!='(')
-        throw input_format_error();
+        throw inputFormatError();
     if(!CM.hasTable(table_name))
-        throw table_not_exist();
+        throw tableNotExist();
     attr_exist=CM.getAttribute(table_name);
     check_index--;
     int num_of_insert=0;
     //对括号内的所有元素进行遍历
     while(query[check_index+1]!='\0'&&query[check_index+1]!=')'){
-        if(num_of_insert>=attr_exist.num)
+        if(num_of_insert>=attr_exist.numberOfAttribute)
             throw 1;//属性数不匹配
         check_index+=3;
         string value_insert=getWord(check_index, check_index);
@@ -349,31 +349,31 @@ void Interpreter::EXEC_INSERT(){
         switch (attr_exist.type[num_of_insert]) {
             case -1:
                 try {
-                    insert_data.datai=stringToNum<int>(value_insert);
+                    insert_data.intData=stringToNum<int>(value_insert);
                 } catch (...) {
-                    throw data_type_conflict();//转换失败
+                    throw dataTypeConflict();//转换失败
                 }
                 break;
             case 0:
                 try {
-                    insert_data.dataf=stringToNum<float>(value_insert);
+                    insert_data.floatData=stringToNum<float>(value_insert);
                 } catch (...) {
-                    throw data_type_conflict();//转换失败
+                    throw dataTypeConflict();//转换失败
                 }
                 break;
             default:
                 try {
                     if(!(value_insert[0]=='\''&&value_insert[value_insert.length()-1]=='\'')&&!(value_insert[0]=='"'&&value_insert[value_insert.length()-1]=='"'))
-                        throw input_format_error();//格式不正确
+                        throw inputFormatError();//格式不正确
                     if(value_insert.length()-1>attr_exist.type[num_of_insert])
-                        throw input_format_error();//长度超过限制
-                    insert_data.datas=value_insert.substr(1,value_insert.length()-2);
+                        throw inputFormatError();//长度超过限制
+                    insert_data.stringData=value_insert.substr(1,value_insert.length()-2);
                 }
-                catch(input_format_error error){
-                    throw input_format_error();
+                catch(inputFormatError error){
+                    throw inputFormatError();
                 }
                 catch (...) {
-                    throw data_type_conflict();//转换失败
+                    throw dataTypeConflict();//转换失败
                 }
                 break;
         }
@@ -381,9 +381,9 @@ void Interpreter::EXEC_INSERT(){
         num_of_insert++;
     }
     if(query[check_index+1]=='\0')
-        throw input_format_error();//格式错误
-    if(num_of_insert!=attr_exist.num)
-        throw input_format_error();//插入的数量不正确
+        throw inputFormatError();//格式错误
+    if(num_of_insert!=attr_exist.numberOfAttribute)
+        throw inputFormatError();//插入的数量不正确
     API.insertRecord(table_name, tuple_insert);
     cout<<">>> SUCCESS"<<endl;
 }
@@ -420,20 +420,20 @@ void Interpreter::EXEC_SELECT(){
         }
     }
     if(getLower(query, check_index).substr(check_index,4)!="from")
-        throw input_format_error();//格式错误
+        throw inputFormatError();//格式错误
     check_index+=5;
     table_name=getWord(check_index, check_index);
     if(!CM.hasTable(table_name))
-        throw table_not_exist();
+        throw tableNotExist();
     Attribute tmp_attr=CM.getAttribute(table_name);
     if(!flag){
         for(int index=0;index<attr_name.size();index++){
             if(!CM.hasAttribute(table_name, attr_name[index]))
-                throw attribute_not_exist();
+                throw attributeNotExist();
         }
     }
     else{
-        for(int index=0;index<tmp_attr.num;index++){
+        for(int index=0;index<tmp_attr.numberOfAttribute;index++){
             attr_name.push_back(tmp_attr.name[index]);
         }
     }
@@ -442,59 +442,59 @@ void Interpreter::EXEC_SELECT(){
         output_table=API.selectRecord(table_name, target_name, where_select,op);
     else{
         if(getLower(query, check_index).substr(check_index,5)!="where")
-            throw input_format_error();//格式错误
+            throw inputFormatError();//格式错误
         check_index+=6;
         while(1){
             tmp_target_name=getWord(check_index, check_index);
             if(!CM.hasAttribute(table_name, tmp_target_name))
-                throw attribute_not_exist();
+                throw attributeNotExist();
             target_name.push_back(tmp_target_name);
             relation=getRelation(check_index+1, check_index);
             if(relation=="<")
-                tmp_where.relation_character=LESS;
+                tmp_where.relation=Less;
             else if(relation=="< =")
-                tmp_where.relation_character=LESS_OR_EQUAL;
+                tmp_where.relation= lessEqual;
             else if(relation=="=")
-                tmp_where.relation_character=EQUAL;
+                tmp_where.relation=Equal;
             else if(relation=="> =")
-                tmp_where.relation_character=GREATER_OR_EQUAL;
+                tmp_where.relation=greaterEqual;
             else if(relation==">")
-                tmp_where.relation_character=GREATER;
+                tmp_where.relation=Greater;
             else if(relation=="! =")
-                tmp_where.relation_character=NOT_EQUAL;
+                tmp_where.relation=notEqual;
             else
-                throw input_format_error();//格式错误
+                throw inputFormatError();//格式错误
             tmp_value=getWord(check_index+1, check_index);
-            for(int i=0;i<tmp_attr.num;i++)
+            for(int i=0;i<tmp_attr.numberOfAttribute;i++)
             {
                 if(tmp_target_name==tmp_attr.name[i]){
                     tmp_where.data.type=tmp_attr.type[i];
                     switch (tmp_where.data.type) {
                         case -1:
                             try {
-                                tmp_where.data.datai=stringToNum<int>(tmp_value);
+                                tmp_where.data.intData=stringToNum<int>(tmp_value);
                             } catch (...) {
-                                throw data_type_conflict();//转换失败
+                                throw dataTypeConflict();//转换失败
                             }
                             break;
                         case 0:
                             try {
-                                tmp_where.data.dataf=stringToNum<float>(tmp_value);
+                                tmp_where.data.floatData=stringToNum<float>(tmp_value);
                             } catch (...) {
-                                throw data_type_conflict();//转换失败
+                                throw dataTypeConflict();//转换失败
                             }
                             break;
                         default:
                             try {
                                 if(!(tmp_value[0]!='\''&&tmp_value[tmp_value.length()-1]!='\'')&&!(tmp_value[0]!='"'&&tmp_value[tmp_value.length()-1]!='"'))
-                                    throw input_format_error();//格式不正确
-                                tmp_where.data.datas=tmp_value.substr(1,tmp_value.length()-2);
+                                    throw inputFormatError();//格式不正确
+                                tmp_where.data.stringData=tmp_value.substr(1,tmp_value.length()-2);
                             }
-                            catch(input_format_error error){
-                                throw input_format_error();
+                            catch(inputFormatError error){
+                                throw inputFormatError();
                             }
                             catch (...) {
-                                throw data_type_conflict();//转换失败
+                                throw dataTypeConflict();//转换失败
                             }
                     }
                     break;
@@ -519,15 +519,15 @@ void Interpreter::EXEC_SELECT(){
     
     //以下是输出函数
     
-    Attribute attr_record=output_table.attr_;
+    Attribute attr_record=output_table._attr;
     int use[32]={0};
     if(attr_name.size()==0){
-        for(int i=0;i<attr_record.num;i++)
+        for(int i=0;i<attr_record.numberOfAttribute;i++)
             use[i]=i;
     }
     else{
         for(int i=0;i<attr_name.size();i++)
-            for(int j=0;j<attr_record.num;j++){
+            for(int j=0;j<attr_record.numberOfAttribute;j++){
                 if(attr_record.name[j]==attr_name[i])
                 {
                     use[i]=j;
@@ -545,22 +545,22 @@ void Interpreter::EXEC_SELECT(){
         int type=attr_record.type[use[index]];
         if(type==-1){
             for(int i=0;i<output_tuple.size();i++){
-                if(longest<getBits(output_tuple[i].getData()[use[index]].datai)){
-                    longest=getBits(output_tuple[i].getData()[use[index]].datai);
+                if(longest<getBits(output_tuple[i].getData()[use[index]].intData)){
+                    longest=getBits(output_tuple[i].getData()[use[index]].intData);
                 }
             }
         }
         if(type==0){
             for(int i=0;i<output_tuple.size();i++){
-                if(longest<getBits(output_tuple[i].getData()[use[index]].dataf)){
-                    longest=getBits(output_tuple[i].getData()[use[index]].dataf);
+                if(longest<getBits(output_tuple[i].getData()[use[index]].floatData)){
+                    longest=getBits(output_tuple[i].getData()[use[index]].floatData);
                 }
             }
         }
         if(type>0){
             for(int i=0;i<output_tuple.size();i++){
-                if(longest<output_tuple[i].getData()[use[index]].datas.length()){
-                    longest=(int)output_tuple[i].getData()[use[index]].datas.length();
+                if(longest<output_tuple[i].getData()[use[index]].stringData.length()){
+                    longest=(int)output_tuple[i].getData()[use[index]].stringData.length();
                 }
             }
         }
@@ -594,21 +594,21 @@ void Interpreter::EXEC_SELECT(){
             switch (output_tuple[index].getData()[use[i]].type) {
                 case -1:
                     if(i!=attr_name.size()-1){
-                        int len=output_tuple[index].getData()[use[i]].datai;
+                        int len=output_tuple[index].getData()[use[i]].intData;
                         len=getBits(len);
                         for(int i=0;i<(longest-len)/2;i++)
                             printf(" ");
-                        printf("%d",output_tuple[index].getData()[use[i]].datai);
+                        printf("%d",output_tuple[index].getData()[use[i]].intData);
                         for(int i=0;i<longest-(longest-len)/2-len;i++)
                             printf(" ");
                         printf("|");
                     }
                     else{
-                        int len=output_tuple[index].getData()[use[i]].datai;
+                        int len=output_tuple[index].getData()[use[i]].intData;
                         len=getBits(len);
                         for(int i=0;i<(longest-len)/2;i++)
                             printf(" ");
-                        printf("%d",output_tuple[index].getData()[use[i]].datai);
+                        printf("%d",output_tuple[index].getData()[use[i]].intData);
                         for(int i=0;i<longest-(longest-len)/2-len;i++)
                             printf(" ");
                         printf("\n");
@@ -616,28 +616,28 @@ void Interpreter::EXEC_SELECT(){
                     break;
                 case 0:
                     if(i!=attr_name.size()-1){
-                        float num=output_tuple[index].getData()[use[i]].dataf;
+                        float num=output_tuple[index].getData()[use[i]].floatData;
                         int len=getBits(num);
                         for(int i=0;i<(longest-len)/2;i++)
                             printf(" ");
-                        printf("%.2f",output_tuple[index].getData()[use[i]].dataf);
+                        printf("%.2f",output_tuple[index].getData()[use[i]].floatData);
                         for(int i=0;i<longest-(longest-len)/2-len;i++)
                             printf(" ");
                         printf("|");
                     }
                     else{
-                        float num=output_tuple[index].getData()[use[i]].dataf;
+                        float num=output_tuple[index].getData()[use[i]].floatData;
                         int len=getBits(num);
                         for(int i=0;i<(longest-len)/2;i++)
                             printf(" ");
-                        printf("%.2f",output_tuple[index].getData()[use[i]].dataf);
+                        printf("%.2f",output_tuple[index].getData()[use[i]].floatData);
                         for(int i=0;i<longest-(longest-len)/2-len;i++)
                             printf(" ");
                         printf("\n");
                     }
                     break;
                 default:
-                    string tmp=output_tuple[index].getData()[use[i]].datas;
+                    string tmp=output_tuple[index].getData()[use[i]].stringData;
                     if(i!=attr_name.size()-1){
                         for(int i=0;i<(longest-tmp.length())/2;i++)
                             printf(" ");
@@ -647,7 +647,7 @@ void Interpreter::EXEC_SELECT(){
                         printf("|");
                     }
                     else{
-                        string tmp=output_tuple[index].getData()[i].datas;
+                        string tmp=output_tuple[index].getData()[i].stringData;
                         for(int i=0;i<(longest-tmp.length())/2;i++)
                             printf(" ");
                         printf("%s",tmp.c_str());
@@ -669,7 +669,7 @@ void Interpreter::EXEC_CREATE_TABLE(){
     table_name=getWord(13,check_index);
     //表的索引初始化
     Index index_create;
-    index_create.num=0;
+    index_create.numberOfIndex=0;
     //设置属性
     Attribute attr_create;
     string attr_name;
@@ -702,7 +702,7 @@ void Interpreter::EXEC_CREATE_TABLE(){
                 check_index=tmp_end+3;
                 string unique_name=getWord(check_index, check_index);
                 int hasset=1;
-                for(int find_name=0;find_name<attr_create.num;find_name++){
+                for(int find_name=0;find_name<attr_create.numberOfAttribute;find_name++){
                     if(attr_create.name[find_name]==unique_name){
                         hasset=0;
                         primary=find_name;
@@ -735,7 +735,7 @@ void Interpreter::EXEC_CREATE_TABLE(){
         }
         //更新属性的数量
         attr_num++;
-        attr_create.num=attr_num;
+        attr_create.numberOfAttribute=attr_num;
     }
     //调用CatalogManager，将表的信息插入进去
     API API;
@@ -849,4 +849,5 @@ int Interpreter::getBits(float num){
     }
     return bit+3;//为了保留小数点的后几位
 }
+
 
