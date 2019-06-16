@@ -321,7 +321,7 @@ void CatalogManager::showTable(string table_name) {
 		cout << "-";
 	cout << endl;
 	for (int index_out = 0; index_out<index_record.numberOfIndex; index_out++) {
-		cout << index_out << setw(3 - index_out / 10) << "|" << index_record.location[index_out] << setw(8 - index_record.location[index_out] / 10) << "|" << index_record.indexname[index_out] << endl;
+		cout << index_out << setw(3 - index_out / 10) << "|" << index_record.location[index_out] << setw(8 - index_record.location[index_out] / 10) << "|" << index_record.name[index_out] << endl;
 	}
 	for (int index_out = 0; index_out<((longest + 14)>18 ? (longest + 14) : 18); index_out++)
 		cout << "-";
