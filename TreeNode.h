@@ -19,7 +19,6 @@
 #include "exception.h"
 #include "bufferManager.h"
 
-#endif
 
 template <typename T>
 class TreeNode {
@@ -338,3 +337,5 @@ void TreeNode<T>::printl() {
     cout << endl;
     
 }
+
+#endif

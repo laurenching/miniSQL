@@ -9,7 +9,6 @@
 
 #include "TreeNode.h"
 
-#endif
 
 template <typename T>
 class BPlusTree {
@@ -718,3 +717,5 @@ void copyString(char* p , int& offset , T data) {
         p[offset] = s1[i];
 }
 
+
+#endif

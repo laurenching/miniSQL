@@ -43,4 +43,5 @@ private:
     intMap indexIntMap;
     floatMap indexFloatMap;
     stringMap indexStringMap;
-}
+};
+#endif

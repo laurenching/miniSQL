@@ -3,60 +3,60 @@
 using namespace std;
 
 void CatalogManager::createTable(name, Attribute Attr, int primary, Index index){
-    //Èç¹ûÒÑ´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(hasTable(name)){
         throw table_exist();
     }
-    //È·±£Ö÷¼üÎªunique
+    //È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªunique
     Attr.unique[primary]=true;
-    //¼ÇÂ¼Ã¿ÌõĞÅÏ¢µÄ×Ö·ûÊı£¨°üÀ¨ÕâÀïµÄ5¸ö£©
+    //ï¿½ï¿½Â¼Ã¿ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½
     string str_tmp="0000 ";
-    //Ìí¼Óname
+    //ï¿½ï¿½ï¿½ï¿½name
     str_tmp+=name;
-    //Ìí¼ÓattributeµÄÊıÁ¿
+    //ï¿½ï¿½ï¿½ï¿½attributeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     str_tmp=str_tmp+" "+num2str(Attr.num, 2);
-    //Ìí¼ÓÃ»¸öattributeµÄĞÅÏ¢£¬Ë³ĞòÎªÀàĞÍ£¬Ãû×Ö£¬ÊÇ·ñÎªÎ¨Ò»
+    //ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½attributeï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ë³ï¿½ï¿½Îªï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½Ç·ï¿½ÎªÎ¨Ò»
     for(int i=0;i<Attr.num;i++)
         str_tmp=str_tmp+" "+num2str(Attr.type[i], 3)+" "+Attr.name[i]+" "+(Attr.unique[i]==true?"1":"0");
-    //Ìí¼ÓÖ÷¼üĞÅÏ¢
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     str_tmp=str_tmp+" "+num2str(primary, 2);
-    //Ìí¼ÓindexµÄÊıÁ¿, ;ÓÃÀ´×ö±ê¼ÇindexµÄ¿ªÊ¼
+    //ï¿½ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ;ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½indexï¿½Ä¿ï¿½Ê¼
     str_tmp=str_tmp+" ;"+num2str(index.num, 2);
-    //Ìí¼ÓindexµÄĞÅÏ¢£¬Ë³ĞòÎªÏà¶ÔÎ»ÖÃºÍÃû×Ö
+    //ï¿½ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ë³ï¿½ï¿½Îªï¿½ï¿½ï¿½Î»ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½
     for(int i=0;i<index.num;i++)
         str_tmp=str_tmp+" "+num2str(index.location[i], 2)+" "+index.indexname[i];
-    //»»ĞĞºóÔÚ½áÎ²½ÓÉÏÒ»¸ö#£¬Ã¿¸ö¿éÒÔ#½áÎ²
+    //ï¿½ï¿½ï¿½Ğºï¿½ï¿½Ú½ï¿½Î²ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½#ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½#ï¿½ï¿½Î²
     str_tmp=str_tmp+"\n"+"#";
-    //¸ü¸ÄÃ¿ÌõĞÅÏ¢µÄ³¤¶ÈµÄ¼ÇÂ¼
+    //ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä³ï¿½ï¿½ÈµÄ¼ï¿½Â¼
     string str_len=num2str((int)str_tmp.length()-1, 4);
     str_tmp=str_len+str_tmp.substr(4,str_tmp.length()-4);
-    //¼ÆËã¿éµÄÊıÁ¿
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     int block_num=getBlockNum(TABLE_MANAGER_PATH)/PAGESIZE;
-    //´¦Àíµ±¿éµÄÊıÁ¿Îª0µÄÌØÊâÇé¿ö
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if(block_num<=0)
         block_num=1;
-    //±éÀúËùÓĞµÄ¿é
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ĞµÄ¿ï¿½
     for(int current_block=0;current_block<block_num;current_block++){
         char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , current_block);
         int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , current_block);
-        //Ñ°ÕÒ¸ÃblockµÄÓĞĞ§³¤¶È
+        //Ñ°ï¿½Ò¸ï¿½blockï¿½ï¿½ï¿½ï¿½Ğ§ï¿½ï¿½ï¿½ï¿½
         int length=0;
         for(length=0;length<PAGESIZE&&buffer[length]!='\0'&&buffer[length]!='#';length++){}
-        //È·±£²åÈëĞÂĞÅÏ¢ºó¸ÃÒ³³¤¶È²»»á³¬¹ıPAGESIZE
+        //È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ò³ï¿½ï¿½ï¿½È²ï¿½ï¿½á³¬ï¿½ï¿½PAGESIZE
         if(length+(int)str_tmp.length()<PAGESIZE){
-            //É¾³ı#
+            //É¾ï¿½ï¿½#
             if(length&&buffer[length-1]=='#')
                 buffer[length-1]='\0';
             else if(buffer[length]=='#')
                 buffer[length]='\0';
-            //×Ö·û´®Æ´½Ó
+            //ï¿½Ö·ï¿½ï¿½ï¿½Æ´ï¿½ï¿½
             strcat(buffer , str_tmp.c_str());
-            //±£´æ²¢Ë¢ĞÂ¸ÃÒ³ºó·µ»Ø
+            //ï¿½ï¿½ï¿½æ²¢Ë¢ï¿½Â¸ï¿½Ò³ï¿½ó·µ»ï¿½
             bufferManager.modifyPage(page_id);
             return;
         }
     }
-    //Èç¹ûÖ®Ç°µÄ¿é²»¹»ÓÃ£¬¾ÍĞÂ½¨Ò»¿éºóÖ±½Ó°ÑĞÅÏ¢²åÈë
+    //ï¿½ï¿½ï¿½Ö®Ç°ï¿½Ä¿é²»ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Â½ï¿½Ò»ï¿½ï¿½ï¿½Ö±ï¿½Ó°ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½
     char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , block_num);
     int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , block_num);
     strcat(buffer , str_tmp.c_str());
@@ -65,18 +65,18 @@ void CatalogManager::createTable(name, Attribute Attr, int primary, Index index)
 }
 
 void CatalogManager::dropTable(string name){
-    //Èç¹û²»´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(name)){
         throw table_not_exist();
     }
-    //Ñ°ÕÒtable_nameËù¶ÔÓ¦µÄ¿éºÅºÍÔÚ¸Ã¿éµÄÎ»ÖÃ
+    //Ñ°ï¿½ï¿½table_nameï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä¿ï¿½Åºï¿½ï¿½Ú¸Ã¿ï¿½ï¿½Î»ï¿½ï¿½
     int suitable_block;
     int start_index=getTablePlace(name,suitable_block);
-    //µÃµ½Ëù¶ÔÓ¦¿éµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
     int page_id = bufferManager.getPageId(TABLE_MANAGER_PATH , suitable_block);
     string buffer_check(buffer);
-    //Çó³öÓ¦É¾³ıµÄ¿éµÄindexµÄ¿ªÊ¼ºÍ½áÎ²ºóÉ¾³ı
+    //ï¿½ï¿½ï¿½Ó¦É¾ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½indexï¿½Ä¿ï¿½Ê¼ï¿½Í½ï¿½Î²ï¿½ï¿½É¾ï¿½ï¿½
     int end_index=start_index+str2num(buffer_check.substr(start_index,4));
     int index=0,current_index=0;;
     do{
@@ -86,32 +86,32 @@ void CatalogManager::dropTable(string name){
     }while(buffer[index]!='#');
     buffer[current_index++]='#';
     buffer[current_index]='\0';
-    //Ë¢ĞÂÒ³Ãæ
+    //Ë¢ï¿½ï¿½Ò³ï¿½ï¿½
     bufferManager.modifyPage(page_id);
 }
 
 Attribute CatalogManager::getAttribute(string name){
-    //Èç¹û²»´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(name)){
         throw attribute_not_exist();
     }
-    //Ñ°ÕÒtable_name¶ÔÓ¦µÄ¿éºÍÔÚ¿éÖĞµÄÎ»ÖÃ
+    //Ñ°ï¿½ï¿½table_nameï¿½ï¿½Ó¦ï¿½Ä¿ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½Ğµï¿½Î»ï¿½ï¿½
     int suitable_block;
     int start_index=getTablePlace(name,suitable_block);
-    //µÃµ½Ëù¶ÔÓ¦µÄ¿éµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ï¢
     char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
     string buffer_check(buffer);
-    //end_index¼ÇÂ¼¸ÃĞĞÖĞ±íµÄÃû×ÖµÄ×îºóÒ»¸ö×Ö·ûµÄÎ»ÖÃ
+    //end_indexï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ğ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Î»ï¿½ï¿½
     int end_index=0;
     string table_name=getTableName(buffer_check, start_index, end_index);
     Attribute table_attr;
     start_index=end_index+1;
-    //µÃµ½attributeÊıÁ¿µÄ×Ö·û´®
+    //ï¿½Ãµï¿½attributeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
     string attr_num=buffer_check.substr(start_index,2);
     table_attr.num=str2num(attr_num);
     start_index+=3;
     for(int index=0;index<table_attr.num;index++){
-        //¶ÔËùÓĞµÄattributeµÄÀàĞÍºÍÃû×Ö
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½attributeï¿½ï¿½ï¿½ï¿½ï¿½Íºï¿½ï¿½ï¿½ï¿½ï¿½
         if(buffer_check[start_index]=='-'){
             table_attr.type[index]=-1;
             start_index+=5;
@@ -141,12 +141,12 @@ Attribute CatalogManager::getAttribute(string name){
         }
         start_index+=2;
     }
-    //¼ÇÂ¼primary_keyµÄĞÅÏ¢
+    //ï¿½ï¿½Â¼primary_keyï¿½ï¿½ï¿½ï¿½Ï¢
     if(buffer_check[start_index]=='-')
         table_attr.primary_key=-1;
     else
         table_attr.primary_key=str2num(buffer_check.substr(start_index,2));
-    //ÉèÖÃindexµÄĞÅÏ¢
+    //ï¿½ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½Ï¢
     Index index_record=getIndex(table_name);
     for(int i=0;i<32;i++)
         table_attr.has_index[i]=false;
@@ -156,15 +156,15 @@ Attribute CatalogManager::getAttribute(string name){
     return table_attr;
 }
 
-//ÅĞ¶ÏÔÚËùÓĞµÄattributeÖĞÊÇ·ñ´æÔÚÊôĞÔµÄÃû×Ö
+//ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½attributeï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½
 bool CatalogManager::hasAttribute(string table_name, string attr_name)
 {
-    //Èç¹û²»´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(table_name))
 	{
         throw table_not_exist();
     }
-    //µÃµ½attributeµÄĞÅÏ¢ºó£¬±éÀúËùÓĞµÄÃû×Ö
+    //ï¿½Ãµï¿½attributeï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ó£¬±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½ï¿½ï¿½ï¿½ï¿½
     Attribute find_attr=getAttribute(table_name);
     for(int index=0;index<find_attr.num;index++){
         if(attr_name==find_attr.name[index])
@@ -173,7 +173,7 @@ bool CatalogManager::hasAttribute(string table_name, string attr_name)
     return false;
 }
 
-//¸ù¾İindex_name·µ»Øattr_name
+//ï¿½ï¿½ï¿½ï¿½index_nameï¿½ï¿½ï¿½ï¿½attr_name
 string CatalogManager::IndextoAttr(string table_name, string index_name)
 {
     if(!hasTable(table_name))
@@ -194,32 +194,32 @@ string CatalogManager::IndextoAttr(string table_name, string index_name)
 
 void CatalogManager::createIndex(string table_name, string attr_name, string index_name)
 {
-    //Èç¹û²»´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(table_name))
         throw table_not_exist();
-    //Èç¹û²»´æÔÚ¸ÃÊôĞÔ£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasAttribute(table_name, attr_name))
         throw attribute_not_exist();
-    //µÃµ½¸Ã±íµÄindexµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½Ã±ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½Ï¢
     Index index_record=getIndex(table_name);
-    //Èç¹ûindexµÄÊıÁ¿ÒÑ¾­´óÓÚµÈÓÚ10£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½10ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(index_record.num>=10)
         throw index_full();
-    //µÃµ½ÊôĞÔµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½Ï¢
     Attribute find_attr=getAttribute(table_name);
-    //±éÀúËùÓĞÒÑÓĞµÄindex
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½index
     for(int i=0;i<index_record.num;i++){
-        //Ë÷ÒıÃûÖØ¸´´íÎó
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½
         if(index_record.indexname[i]==index_name)
             throw index_exist();
-        //Ë÷ÒıÖØ¸´
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½
         if(find_attr.name[index_record.location[i]]==attr_name)
             throw index_exist();
     }
-    //Ìí¼ÓË÷Òı
-    //Ìí¼ÓË÷ÒıµÄÃû×Ö
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     index_record.indexname[index_record.num]=index_name;
-    //Ìí¼ÓË÷ÒıÔÚattributeµÄÎ»ÖÃ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½attributeï¿½ï¿½Î»ï¿½ï¿½
     for(int index=0;index<find_attr.num;index++){
         if(attr_name==find_attr.name[index])
         {
@@ -227,24 +227,24 @@ void CatalogManager::createIndex(string table_name, string attr_name, string ind
             break;
         }
     }
-    //×ÜÊıÁ¿¼ÓÒ»
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»
     index_record.num++;
-    //ÔÚÔ­ÓĞ±íÖĞÉ¾³ı¸Ã±íºóÔÙ²åÈë£¬ÊµÏÖË¢ĞÂ
+    //ï¿½ï¿½Ô­ï¿½Ğ±ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ë£¬Êµï¿½ï¿½Ë¢ï¿½ï¿½
     dropTable(table_name);
     createTable(table_name, find_attr, find_attr.primary_key, index_record);
 }
 
 void CatalogManager::dropIndex(string table_name, string index_name)
 {
-    //Èç¹û²»´æÔÚ¸ÃË÷Òı£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(table_name)){
         throw table_not_exist();
     }
-    //µÃµ½¸Ã±íµÄindexµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½Ã±ï¿½ï¿½ï¿½indexï¿½ï¿½ï¿½ï¿½Ï¢
     Index index_record=getIndex(table_name);
-    //µÃµ½ÊôĞÔµÄĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½Ï¢
     Attribute attr_record=getAttribute(table_name);
-    //±éÀúËùÓĞµÄindex£¬²éÕÒÊÇ·ñÓĞ¶ÔÓ¦Ãû×ÖµÄË÷Òı£¬Èç¹û²»´æÔÚÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ğ¶ï¿½Ó¦ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     int hasindex=-1;
     for(int index=0;index<index_record.num;index++){
         if(index_record.indexname[index]==index_name){
@@ -255,11 +255,11 @@ void CatalogManager::dropIndex(string table_name, string index_name)
     if(hasindex==-1){
         throw index_not_exist();
     }
-    //Í¨¹ı½«¸ÃĞÅÏ¢Óë×îºóÎ»ÖÃµÄË÷ÒıÌæ»»µÄ·½Ê½À´É¾³ıË÷Òı
+    //Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ»»ï¿½Ä·ï¿½Ê½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     index_record.indexname[hasindex]=index_record.indexname[index_record.num-1];
     index_record.location[hasindex]=index_record.location[index_record.num-1];
     index_record.num--;
-    //ÔÚÔ­ÓĞ±íÖĞÉ¾³ı¸Ã±íºóÔÙ²åÈë£¬ÊµÏÖË¢ĞÂ
+    //ï¿½ï¿½Ô­ï¿½Ğ±ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ë£¬Êµï¿½ï¿½Ë¢ï¿½ï¿½
     dropTable(table_name);
     createTable(table_name, attr_record, attr_record.primary_key, index_record);
     
@@ -267,21 +267,21 @@ void CatalogManager::dropIndex(string table_name, string index_name)
 
 void CatalogManager::showTable(string table_name)
 {
-    //Èç¹û²»´æÔÚ¸Ã±í£¬ÔòÒì³£
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì³£
     if(!hasTable(table_name)){
         throw table_not_exist();
     }
-    //´òÓ¡±íµÄÃû×Ö
+    //ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     cout<<"Table name:"<<table_name<<endl;
     Attribute attr_record=getAttribute(table_name);
     Index index_record=getIndex(table_name);
-    //Ñ°ÕÒ×î³¤µÄindex_nameµÄĞÅÏ¢£¬ÔÚÖ®ºóµÄ´òÓ¡±í¸ñÖĞ»áÓÃµ½
+    //Ñ°ï¿½ï¿½ï¿½î³¤ï¿½ï¿½index_nameï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä´ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½Ğ»ï¿½ï¿½Ãµï¿½
     int longest=-1;
     for(int index=0;index<attr_record.num;index++){
         if((int)attr_record.name[index].length()>longest)
             longest=(int)attr_record.name[index].length();
     }
-    //´òÓ¡ÊôĞÔ
+    //ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½
     string type;
     cout<<"Attribute:"<<endl;
     cout<<"Num|"<<"Name"<<setw(longest+2)<<"|Type"<<type<<setw(6)<<"|"<<"Unique|Primary Key"<<endl;
@@ -315,7 +315,7 @@ void CatalogManager::showTable(string table_name)
     
     cout<<endl;
     
-    //´òÓ¡Ë÷Òı
+    //ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½
     cout<<"Index:"<<endl;
     cout<<"Num|Location|Name"<<endl;
     longest=-1;
@@ -334,40 +334,40 @@ void CatalogManager::showTable(string table_name)
     cout<<endl<<endl;
 }
 
-//ÅĞ¶ÏÊÇ·ñÒÑÓĞÖØÃûµÄ±í¸ñ
+//ï¿½Ğ¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½
 bool CatalogManager::hasTable(string table_name)
 {
-    //¼ÆËã¿éµÄÊıÁ¿
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     int block_num=getBlockNum(TABLE_MANAGER_PATH)/PAGESIZE;
     if(block_num<=0)
         block_num=1;
-    //±éÀúËùÓĞµÄ¿é
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ĞµÄ¿ï¿½
     for(int current_block=0;current_block<block_num;current_block++){
         char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , current_block);
         string buffer_check(buffer);
         string str_tmp="";
         int start_index=0,end_index=0;
         do{
-            //Èç¹ûÒ»¿ªÊ¼¾ÍÊÇ#£¬Ôò¼ì²éÏÂÒ»¿é
+            //ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
             if(buffer_check[0]=='#')
                 break;
-            //µÃµ½tableµÄÃû×Ö£¬Èç¹ûÓëÊäÈëµÄÃû×ÖÏàÍ¬£¬Ôòreturn true
+            //ï¿½Ãµï¿½tableï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½return true
             else if(getTableName(buffer, start_index, end_index)==table_name){
                 return true;
             }
             else{
-                //Í¨¹ı×Ö·û´®³¤¶ÈÀ´ÖØĞÂÈ·¶¨ÏÂÒ»¸ötableµÄÎ»ÖÃ
+                //Í¨ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½tableï¿½ï¿½Î»ï¿½ï¿½
                 start_index+=str2num(buffer_check.substr(start_index,4));
-                //ÅÅ³ı¿ÕÎÄµµµÄÌØÊâÌõ¼ş
+                //ï¿½Å³ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 if(!start_index)
                     break;
             }
-        }while(buffer_check[start_index]!='#');  //ÅĞ¶ÏÊÇ·ñµ½Í·
+        }while(buffer_check[start_index]!='#');  //ï¿½Ğ¶ï¿½ï¿½Ç·ï¿½Í·
     }
     return false;
 }
 
-//Êı×Ö×ª×Ö·û´®£¬bitÎªÊı×ÖµÄÎ»Êı
+//ï¿½ï¿½ï¿½ï¿½×ªï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½bitÎªï¿½ï¿½ï¿½Öµï¿½Î»ï¿½ï¿½
 string CatalogManager::num2str(int num,short bit)
 {
     string str="";
@@ -383,12 +383,12 @@ string CatalogManager::num2str(int num,short bit)
     return str;
 }
 
-//×Ö·û´®×ªÊı×Ö
+//ï¿½Ö·ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
 int CatalogManager::str2num(string str){
     return atoi(str.c_str());
 }
 
-//µÃµ½¸ÃĞĞµÄ±íµÄÃû×Ö
+//ï¿½Ãµï¿½ï¿½ï¿½ï¿½ĞµÄ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 string CatalogManager::getTableName(string buffer,int start,int &rear){
     string str_tmp="";
     rear=0;
@@ -402,49 +402,49 @@ string CatalogManager::getTableName(string buffer,int start,int &rear){
     return str_tmp;
 }
 
-//µÃµ½¸Ã±íµÄÎ»ÖÃ£¬ÒıÓÃ´«³ö¸Ã±íµÄËùÔÚµÄ¿éµÄÎ»ÖÃ£¬·µ»ØÔÚ¿éÖĞµÄÎ»ÖÃ£¬Èç¹ûÎ´ÕÒµ½£¬Ôò·µ»Ø-1
+//ï¿½Ãµï¿½ï¿½Ã±ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÚµÄ¿ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½Ğµï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Î´ï¿½Òµï¿½ï¿½ï¿½ï¿½ò·µ»ï¿½-1
 int CatalogManager::getTablePlace(string name,int &suitable_block){
     int block_num=getBlockNum(TABLE_MANAGER_PATH);
     if(block_num<=0)
         block_num=1;
-    //±éÀúËùÓĞµÄ¿é
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ĞµÄ¿ï¿½
     for(suitable_block=0;suitable_block<block_num;suitable_block++){
         char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
         string buffer_check(buffer);
         string str_tmp="";
         int start=0,rear=0;
         do{
-            //Èç¹ûÒ»¿ªÊ¼¾ÍÊÇ#£¬Ôò¼ì²éÏÂÒ»¿é
+            //ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
             if(buffer_check[0]=='#')
                 break;
             if(getTableName(buffer, start, rear)==name){
                 return start;
             }
             else{
-                //Í¨¹ı×Ö·û´®³¤¶ÈÀ´ÖØĞÂÈ·¶¨start
+                //Í¨ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½start
                 start+=str2num(buffer_check.substr(start,4));
                 if(!start)
                     break;
             }
-        }while(buffer_check[start]!='#');  //ÅĞ¶ÏÊÇ·ñµ½Í·
+        }while(buffer_check[start]!='#');  //ï¿½Ğ¶ï¿½ï¿½Ç·ï¿½Í·
     }
     return -1;
 }
 
 Index CatalogManager::getIndex(string table_name){
     Index index_record;
-    //µÃµ½¸Ã±íµÄÎ»ÖÃºÍ¶ÔÓ¦µÄ¿é
+    //ï¿½Ãµï¿½ï¿½Ã±ï¿½ï¿½ï¿½Î»ï¿½ÃºÍ¶ï¿½Ó¦ï¿½Ä¿ï¿½
     int suitable_block;
     int start_index=getTablePlace(table_name,suitable_block);
     char* buffer = bufferManager.getPage(TABLE_MANAGER_PATH , suitable_block);
-    //½«start_index¶ÔÆëË÷ÒıĞÅÏ¢µÄÎ»ÖÃ
+    //ï¿½ï¿½start_indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Î»ï¿½ï¿½
     string buffer_check(buffer);
     while(buffer_check[start_index]!=';')
         start_index++;
     start_index++;
-    //µÃµ½Ë÷ÒıµÄÊıÁ¿
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     index_record.num=str2num(buffer_check.substr(start_index,2));
-    //µÃµ½Ë÷ÒıµÄËùÓĞĞÅÏ¢
+    //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     for(int times=0;times<index_record.num;times++){
         start_index+=3;
         index_record.location[times]=str2num(buffer_check.substr(start_index,2));
@@ -457,7 +457,7 @@ Index CatalogManager::getIndex(string table_name){
     return index_record;
 }
 
-//»ñÈ¡ÎÄ¼ş´óĞ¡
+//ï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½Ğ¡
 int CatalogManager::getBlockNum(string table_name) {
     char* p;
     int block_num = -1;
