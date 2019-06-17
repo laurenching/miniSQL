@@ -7,7 +7,7 @@
 //  Copyright © 2019 yyy. All rights reserved.
 //
 
-#include "recordＭanager.hpp"
+#include "recordManager.hpp"
 #define PATH "./database/data/"
 void RecordManager::createTableFile(string tableName)//創建一個table文件
 {
@@ -44,21 +44,21 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
     {
         for(int i=0;i<tuples.size();i++)//遍歷所有元組
         {
-            if(tuples[i].ifDeleted()==true)//如果該元組還未被刪除
+            if(tuples[i].ifDeleted()==true)//如果該元組被刪除則跳過
                 continue;
             vector<Data> tupleData=tuples[i].getData();//獲得某元組的data數組
             switch(data[attr.primarykey].type)//判斷要插入的元組的主鍵
             {
                 case -1://int
-                    if(data[attr.primarykey].intData==tupleData[i].intData)
+                    if(data[attr.primarykey].intData==tupleData[attr.primarykey].intData)
                         throw primarykeyConflict();
                     break;
                 case 0://float
-                    if(data[attr.primarykey].floatData==tupleData[i].floatData)
+                    if(data[attr.primarykey].floatData==tupleData[attr.primarykey].floatData)
                         throw  primarykeyConflict();
                     break;
                 default://string
-                    if(data[attr.primarykey].stringData==tupleData[i].stringData)
+                    if(data[attr.primarykey].stringData==tupleData[attr.primarykey].stringData)
                         throw primarykeyConflict();
             }
         }
@@ -73,19 +73,19 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
             {
                 if(tuples[j].ifDeleted()==true)//跳過已被刪除的元組
                     continue;
-                vector<Data> tupleData=tuples[i].getData();
+                vector<Data> tupleData=tuples[j].getData();
                 switch(data[i].type)
                 {
                     case -1:
-                        if(data[i].intData==tupleData[j].intData)
+                        if(data[i].intData==tupleData[i].intData)
                             throw uniqueConflict();
                         break;
                     case 0:
-                        if(data[i].floatData==tupleData[j].floatData)
+                        if(data[i].floatData==tupleData[i].floatData)
                             throw  uniqueConflict();
                         break;
                     default:
-                        if(data[i].stringData==tupleData[j].stringData)
+                        if(data[i].stringData==tupleData[i].stringData)
                             throw uniqueConflict();
                 }
             }
@@ -102,6 +102,7 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
         p=bufferManager.getPage(tableFile,blockNum+1);
         blockNum++;
     }while(p[0]!='\0');//now,get the blocknumber
+    
     if(blockNum<=0)
         blockNum=1;
     
@@ -130,7 +131,7 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
 
     
     //更新索引
-    IndexManager indexmanager(tableName);
+    IndexManager indexManager(tableName);
     for(int i =0; i<attr.numberOfAttribute;i++)
     {
         if(attr.hasIndex[i]==true)
@@ -138,7 +139,7 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
             string attrName=attr.name[i];
             string filePath="INDEX_FILE_"+attrName+"_"+tableName;
             vector<Data> indexdata=tuple.getData();
-            indexmanager.insertIndex(filePath,indexdata[i],insertBlock);
+            indexManager.insertIndex(filePath,indexdata[i],insertBlock);
         }
     }
 }
@@ -147,14 +148,15 @@ void RecordManager::insertRecord(string tableName, Tuple &tuple)//insert one tup
 int RecordManager::deleteRecord(string tableName)//刪除該表所有元組
 {
     string tableFile=PATH+tableName;
-    CatalogManager  catalogmanager;
-    Attribute attr =catalogmanager.getAttribute(tableName);
-    IndexManager indexmanager(tableName);
+    CatalogManager  catalogManager;
+    Attribute attr =catalogManager.getAttribute(tableName);
+    IndexManager indexManager(tableName);
     int deleteRecordNumber=0;//刪除的元組數
 
     //檢查該表是否存在
-    if(catalogmanager.hasTable(tableName)==false)
+    if(catalogManager.hasTable(tableName)==false)
         throw tableNotExist();
+    
     char *p;
     int blockNum=-1;//該表所佔block
     do {
@@ -181,7 +183,7 @@ int RecordManager::deleteRecord(string tableName)//刪除該表所有元組
                     string attrName=attr.name[i];
                     string filePath="INDEX_FILE"+attrName+"_"+tableName;
                     vector<Data> indexdata=tuple.getData();
-                    indexmanager.deleteIndexByKey(filePath,indexdata[j]);
+                    indexManager.deleteIndexByKey(filePath,indexdata[j]);
                 }
             }
             //
@@ -199,15 +201,15 @@ int RecordManager::deleteRecord(string tableName)//刪除該表所有元組
 int RecordManager::deleteRecord(string tableName, string deleteAttr, Where where)
 {
     string tableFile=PATH+tableName;
-    CatalogManager  catalogmanager;
-    Attribute attr =catalogmanager.getAttribute(tableName);
+    CatalogManager  catalogManager;
+    Attribute attr =catalogManager.getAttribute(tableName);
     //檢查該表是否存在
-    if(catalogmanager.hasTable(tableName)==false)
+    if(catalogManager.hasTable(tableName)==false)
         throw tableNotExist();
     
     int deleteIndex=-1;//目標屬性位置
     bool attrHasIndex=false;//有無索引
-    for(int i=0;i<attr.numberOfAttribute;i++)
+    for(int i=0;i<attr.numberOfAttribute;i++)//遍歷所有屬性
     {
         if(attr.name[i]==deleteAttr)
         {
@@ -254,10 +256,10 @@ Table RecordManager::selectRecord(string tableName,string resultTableName)
 {
     
     string tableFile = PATH + tableName;
-    CatalogManager catalog_manager;
-     Attribute attr = catalog_manager.getAttribute(tableName);
+    CatalogManager catalogManager;
+    Attribute attr = catalogManager.getAttribute(tableName);
     
-    if (!catalog_manager.hasTable(tableName)) {
+    if (catalogManager.hasTable(tableName)==false) {
         throw tableNotExist();
     }
     
@@ -271,19 +273,19 @@ Table RecordManager::selectRecord(string tableName,string resultTableName)
     if (blockNum <= 0)
         blockNum = 1;
         
-    Table table(resultTableName , attr);
+    Table table(resultTableName , attr);//建構一個table實例
     vector<Tuple>& tuples = table.getTuple();
     
     for (int i = 0;i < blockNum;i++) {
 
         char* p = bufferManager.getPage(tableFile , i);
-        char* k = p;
-        while (*p != '\0' && p < k + PAGESIZE) {
+        char* r = p;
+        while (*p != '\0' && p < r + PAGESIZE) {
             Tuple tuple = readTuple(p , attr);//讀取一個tuple
             if (tuple.ifDeleted() == false)//如果該紀元組沒有被刪除
                 tuples.push_back(tuple);
-            int len = getTupleLength(p);
-            p = p + len;//跳至下一個tuple
+            int tupleLength = getTupleLength(p);
+            p = p + tupleLength;//跳至下一個tuple
         }
     }
     return table;
@@ -295,7 +297,7 @@ Table RecordManager::selectRecord(string tableName,string selectAttr,Where where
     CatalogManager catalogManager;
     Attribute attr = catalogManager.getAttribute(tableName);
    
-    if (!catalogManager.hasTable(tableName)) {
+    if (catalogManager.hasTable(tableName)==false) {
         throw tableNotExist();
     }
     int index = -1;//目標屬性編號
@@ -348,13 +350,11 @@ Table RecordManager::selectRecord(string tableName,string selectAttr,Where where
 
 void RecordManager::createIndex(IndexManager & indexmanager, string tableName, string indexAttr)
 {
-    string tableFile= tableName;
-    tableFile=PATH+ tableName;
-    CatalogManager catalog_manager;
-    Attribute attr = catalog_manager.getAttribute(tableName);
+    string tableFile=PATH+ tableName;
+    CatalogManager catalogManager;
+    Attribute attr = catalogManager.getAttribute(tableName);
     
-  
-    if (!catalog_manager.hasTable(tableName)) {
+    if (catalogManager.hasTable(tableName)==false) {
         throw tableNotExist();
     }
  
@@ -387,15 +387,15 @@ void RecordManager::createIndex(IndexManager & indexmanager, string tableName, s
    
     for (int i = 0;i < blockNum;i++) {//遍歷所有塊
         char* p = bufferManager.getPage(tableFile , i);
-        char* k = p;
-        while (*p != '\0' && p < k + PAGESIZE) {
+        char* r = p;
+        while (*p != '\0' && p < r + PAGESIZE) {
             Tuple tuple = readTuple(p , attr);
             if (tuple.ifDeleted() == false) {
                vector<Data> data = tuple.getData();
                indexmanager.insertIndex(filePath , data[index] , i);
             }
-            int len = getTupleLength(p);
-            p = p + len;//跳至下一個元組
+            int tupleLength = getTupleLength(p);
+            p = p + tupleLength;//跳至下一個元組
         }
     }
 }
@@ -404,14 +404,14 @@ void RecordManager::selectInBlock(string tableName, int blockId, Attribute attr,
     string tableFile=PATH+tableName;
     bool satisfied=false;
     char* p = bufferManager.getPage(tableName , blockId);
-    char* k = p;
+    char* r = p;
     
-    while (*p != '\0' && p < k + PAGESIZE) {
+    while (*p != '\0' && p < r + PAGESIZE) {
 
         Tuple tuple = readTuple(p , attr);
         if (tuple.ifDeleted() == true) {
-            int len = getTupleLength(p);
-            p = p + len;
+            int tupleLength = getTupleLength(p);
+            p = p + tupleLength;
             continue;
         }
         std::vector<Data> data = tuple.getData();
@@ -435,8 +435,8 @@ void RecordManager::selectInBlock(string tableName, int blockId, Attribute attr,
         }
         if(satisfied)
             tuples.push_back(tuple);
-        int len = getTupleLength(p);
-        p = p + len;
+        int tupleLength= getTupleLength(p);
+        p = p + tupleLength;
     }
 }
 void RecordManager::searchWithIndex(string tableName, string searchAttr, Where where, vector<int>& blockId)
@@ -496,7 +496,7 @@ Tuple RecordManager::readTuple(const char *p, Attribute attr)
     {
         Data data;
         data.type=attr.type[i];
-        char temp[50];
+        char temp[100];
         int k;
         for(k=0;*p!=' ';p++)
             temp[k++]=*p;
@@ -523,7 +523,9 @@ Tuple RecordManager::readTuple(const char *p, Attribute attr)
 }
 void RecordManager::insertTupleToTable(char *p, int offset, int length, const vector<Data> &data)//插入元組到緩衝裡
 {
-    string slength=to_string(length);
+    stringstream stream;
+    stream<<length;
+    string slength=stream.str();
     while(slength.length()<4)
         slength="0"+slength;//補齊4位
     for(int i=0;i<slength.length();i++)
@@ -538,8 +540,7 @@ void RecordManager::insertTupleToTable(char *p, int offset, int length, const ve
             {
                 ss<<data[j].intData;
                 for(int i=0;i<ss.str().length();i++)
-                    p[offset++]=ss.str()[i];
-                ss.str().clear();
+                    p[offset++]=ss.str()[i]; 
             }
                 break;
             case 0:
@@ -547,7 +548,6 @@ void RecordManager::insertTupleToTable(char *p, int offset, int length, const ve
                 ss<<data[j].floatData;
                 for(int i=0;i<ss.str().length();i++)
                     p[offset++]=ss.str()[i];
-                ss.str().clear();
             }
                 break;
             default:
@@ -563,8 +563,8 @@ void RecordManager::insertTupleToTable(char *p, int offset, int length, const ve
 int RecordManager::getTupleLength(char *p)
 {
     int tupleLength=0;
-    char temp[5];
-    int k=0;
+    char temp[10];
+    int k;
     for(k=0;p[k]!=' ';k++)
         temp[k]=p[k];
     temp[k]='\0';
@@ -585,14 +585,14 @@ int RecordManager::calculateTupleLength(Tuple &tuple)//計算一個元組的有�
             {
                 ss<<data[i].intData;
                 length+=ss.str().length();
-                ss.str().clear();
+                
             }
                 break;
             case 0:
             {
                 ss<<data[i].floatData;
                 length+=ss.str().length();
-                ss.str().clear();
+              
             }
                 break;
             default:
@@ -608,10 +608,10 @@ int RecordManager::deleteInBlock(string tableName, int blockId, Attribute attr, 
 {
     string tableFile=PATH+tableName;
     char* p = bufferManager.getPage(tableFile , blockId);
-    char* k = p;
+    char* r = p;
     int count = 0;//刪除元組數
     bool satisfied=false;//是否滿足條件
-    while (*p != '\0' && p < k + PAGESIZE) {//遍歷塊中所有的紀錄
+    while (*p != '\0' && p < r + PAGESIZE) {//遍歷塊中所有的紀錄
         Tuple tuple = readTuple(p , attr);
         std::vector<Data> d = tuple.getData();
         switch(attr.type[index]) {
